@@ -580,3 +580,231 @@ body.dark {
 .dark body {
   background-color: #000 !important;
 }
+
+/* ========================= */
+/* 커스텀 스크롤바 스타일링
+   - 본문 영역과 TOC 영역의 스크롤바를 세련되게 개선 */
+/* ========================= */
+
+/* Webkit 브라우저 (Chrome, Safari, Edge) 스크롤바 스타일 */
+/* 본문 영역 스크롤바 */
+article > section.prose::-webkit-scrollbar,
+article > section.prose > div::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+article > section.prose::-webkit-scrollbar-track,
+article > section.prose > div::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+article > section.prose::-webkit-scrollbar-thumb,
+article > section.prose > div::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-neutral-300), 0.5);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+article > section.prose::-webkit-scrollbar-thumb:hover,
+article > section.prose > div::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-neutral-400), 0.7);
+  background-clip: padding-box;
+}
+
+/* 다크 모드 스크롤바 */
+.dark article > section.prose::-webkit-scrollbar-thumb,
+.dark article > section.prose > div::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-neutral-600), 0.5);
+  background-clip: padding-box;
+}
+
+.dark article > section.prose::-webkit-scrollbar-thumb:hover,
+.dark article > section.prose > div::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-neutral-500), 0.7);
+  background-clip: padding-box;
+}
+
+/* TOC 영역 스크롤바 - 실제 내용 영역에만 적용 (버튼 영역 제외) */
+/* 데스크톱에서만 외부 컨테이너 스크롤 제거 */
+@media (min-width: 1280px) {
+  .toc,
+  [data-toc-panel] {
+    overflow: visible !important;
+  }
+
+  /* 외부 컨테이너의 스크롤바 숨김 */
+  .toc::-webkit-scrollbar,
+  [data-toc-panel]::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .toc,
+  [data-toc-panel] {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+}
+
+/* 모바일/태블릿에서는 border-s div에만 스크롤 적용 (제목 부분 제외) */
+@media (max-width: 1279.98px) {
+  /* border-s div에만 스크롤 적용 - 파란색 영역만 스크롤 */
+  [data-toc-panel] > div[class*="border-s"],
+  [data-toc-panel] details > div[class*="border-s"] {
+    max-height: 60vh; /* 모바일에서 적절한 높이 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+  }
+  
+  /* nav#TableOfContents와 다른 요소는 스크롤 없음 */
+  [data-toc-panel] nav#TableOfContents,
+  [data-toc-panel] > nav {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  /* 모바일에서도 얇은 스크롤바 스타일 적용 */
+  [data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar,
+  [data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+  }
+  
+  [data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-track,
+  [data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 1px;
+  }
+  
+  [data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-thumb,
+  [data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-thumb {
+    background: rgba(var(--color-neutral-300), 0.4);
+    border-radius: 1px;
+    border: 0;
+  }
+  
+  [data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-thumb:hover,
+  [data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color-neutral-400), 0.6);
+  }
+  
+  /* 모바일 다크 모드 스크롤바 */
+  .dark [data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-thumb,
+  .dark [data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-thumb {
+    background: rgba(var(--color-neutral-600), 0.4);
+  }
+  
+  .dark [data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-thumb:hover,
+  .dark [data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color-neutral-500), 0.6);
+  }
+  
+  /* 모바일 Firefox 스크롤바 */
+  [data-toc-panel] > div[class*="border-s"],
+  [data-toc-panel] details > div[class*="border-s"] {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(var(--color-neutral-300), 0.4) transparent;
+  }
+  
+  .dark [data-toc-panel] > div[class*="border-s"],
+  .dark [data-toc-panel] details > div[class*="border-s"] {
+    scrollbar-color: rgba(var(--color-neutral-600), 0.4) transparent;
+  }
+}
+
+/* TOC 내용 영역에만 스크롤 적용: 가능한 모든 TOC 컨테이너에 적용 */
+@media (min-width: 1280px) {
+  /* border-s div 또는 details 내부의 div가 스크롤 컨테이너 */
+  [data-toc-panel] > div[class*="border-s"],
+  [data-toc-panel] details > div[class*="border-s"],
+  [data-toc-panel] > nav#TableOfContents,
+  [data-toc-panel] details > div > nav#TableOfContents {
+    /* top-10 (2.5rem) + 버튼 영역(mb-4, 약 1rem) + 여유 공간(0.25rem) */
+    max-height: calc(90vh - 3.75rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* 스크롤바가 오른쪽 끝에 위치하도록 */
+    scrollbar-gutter: stable;
+  }
+}
+
+/* TOC 내용 영역 스크롤바 - 매우 얇게 (2px) - 모든 TOC 컨테이너에 적용 */
+[data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar,
+[data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar,
+[data-toc-panel] > nav#TableOfContents::-webkit-scrollbar,
+[data-toc-panel] details > div > nav#TableOfContents::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+
+[data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-track,
+[data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-track,
+[data-toc-panel] > nav#TableOfContents::-webkit-scrollbar-track,
+[data-toc-panel] details > div > nav#TableOfContents::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 1px;
+}
+
+[data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-thumb,
+[data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-thumb,
+[data-toc-panel] > nav#TableOfContents::-webkit-scrollbar-thumb,
+[data-toc-panel] details > div > nav#TableOfContents::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-neutral-300), 0.4);
+  border-radius: 1px;
+  border: 0;
+}
+
+[data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-thumb:hover,
+[data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-thumb:hover,
+[data-toc-panel] > nav#TableOfContents::-webkit-scrollbar-thumb:hover,
+[data-toc-panel] details > div > nav#TableOfContents::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-neutral-400), 0.6);
+}
+
+/* 다크 모드 TOC 스크롤바 */
+.dark [data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-thumb,
+.dark [data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-thumb,
+.dark [data-toc-panel] > nav#TableOfContents::-webkit-scrollbar-thumb,
+.dark [data-toc-panel] details > div > nav#TableOfContents::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-neutral-600), 0.4);
+}
+
+.dark [data-toc-panel] > div[class*="border-s"]::-webkit-scrollbar-thumb:hover,
+.dark [data-toc-panel] details > div[class*="border-s"]::-webkit-scrollbar-thumb:hover,
+.dark [data-toc-panel] > nav#TableOfContents::-webkit-scrollbar-thumb:hover,
+.dark [data-toc-panel] details > div > nav#TableOfContents::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-neutral-500), 0.6);
+}
+
+/* Firefox 스크롤바 스타일 */
+article > section.prose,
+article > section.prose > div {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-neutral-300), 0.5) transparent;
+}
+
+.dark article > section.prose,
+.dark article > section.prose > div {
+  scrollbar-color: rgba(var(--color-neutral-600), 0.5) transparent;
+}
+
+/* Firefox TOC 스크롤바 - 매우 얇게 (모든 TOC 컨테이너에) */
+[data-toc-panel] > div[class*="border-s"],
+[data-toc-panel] details > div[class*="border-s"],
+[data-toc-panel] > nav#TableOfContents,
+[data-toc-panel] details > div > nav#TableOfContents {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-neutral-300), 0.4) transparent;
+}
+
+.dark [data-toc-panel] > div[class*="border-s"],
+.dark [data-toc-panel] details > div[class*="border-s"],
+.dark [data-toc-panel] > nav#TableOfContents,
+.dark [data-toc-panel] details > div > nav#TableOfContents {
+  scrollbar-color: rgba(var(--color-neutral-600), 0.4) transparent;
+}
