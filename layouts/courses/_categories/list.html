@@ -76,6 +76,45 @@
     {{- $allCourses = where $allCourses "Draft" "!=" true }}
   {{- end }}
   {{- $filteredCourses := where $allCourses "Params.categories" "intersect" (slice $categoryName) }}
+  {{- /* 정렬 파라미터 읽기: sortBy (weight/date/title), sortOrder (asc/desc) */}}
+  {{- $sortBy := .Params.sortBy | default "weight" }}
+  {{- $sortOrder := .Params.sortOrder | default "desc" }}
+  {{- $sortedCourses := slice }}
+  {{- if eq $sortBy "date" }}
+    {{- /* date 기준 정렬 */}}
+    {{- if eq $sortOrder "asc" }}
+      {{- $sortedCourses = $filteredCourses.ByDate }}
+    {{- else }}
+      {{- $sortedCourses = $filteredCourses.ByDate.Reverse }}
+    {{- end }}
+  {{- else if eq $sortBy "title" }}
+    {{- /* title 기준 정렬 */}}
+    {{- if eq $sortOrder "asc" }}
+      {{- $sortedCourses = $filteredCourses.ByTitle }}
+    {{- else }}
+      {{- $sortedCourses = $filteredCourses.ByTitle.Reverse }}
+    {{- end }}
+  {{- else }}
+    {{- /* weight 기준 정렬 (기본값): weight가 있으면 weight 우선, 없으면 date 사용 */}}
+    {{- $pagesWithWeight := where $filteredCourses "Params.weight" "!=" nil }}
+    {{- $pagesWithoutWeight := where $filteredCourses "Params.weight" "==" nil }}
+    {{- $sortedWithWeight := slice }}
+    {{- $sortedWithoutWeight := slice }}
+    {{- if eq $sortOrder "asc" }}
+      {{- $sortedWithWeight = $pagesWithWeight.ByWeight }}
+      {{- $sortedWithoutWeight = $pagesWithoutWeight.ByDate }}
+    {{- else }}
+      {{- $sortedWithWeight = $pagesWithWeight.ByWeight.Reverse }}
+      {{- $sortedWithoutWeight = $pagesWithoutWeight.ByDate.Reverse }}
+    {{- end }}
+    {{- range $sortedWithWeight }}
+      {{- $sortedCourses = $sortedCourses | append . }}
+    {{- end }}
+    {{- range $sortedWithoutWeight }}
+      {{- $sortedCourses = $sortedCourses | append . }}
+    {{- end }}
+  {{- end }}
+  {{- $filteredCourses = $sortedCourses }}
   
   <section>
     {{- /* 카테고리 필터는 항상 표시 */}}
