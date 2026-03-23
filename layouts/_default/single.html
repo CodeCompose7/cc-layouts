@@ -18,6 +18,28 @@
 
           <h1 class="single-title">{{ .Title | emojify }}</h1>
 
+          {{- /* Tags - directly below title */}}
+          {{- $showTaxonomies := .Params.showTaxonomies | default true }}
+          {{- if $showTaxonomies }}
+            {{- $hasTags := false }}
+            {{- range $taxonomy, $terms := .Site.Taxonomies }}
+              {{- if and (ne $taxonomy "categories") (gt (len ($.GetTerms $taxonomy)) 0) }}
+                {{- $hasTags = true }}
+              {{- end }}
+            {{- end }}
+            {{- if $hasTags }}
+              <div class="tag-list" style="margin-top:12px;">
+                {{- range $taxonomy, $terms := .Site.Taxonomies }}
+                  {{- if and (ne $taxonomy "categories") (gt (len ($.GetTerms $taxonomy)) 0) }}
+                    {{- range $.GetTerms $taxonomy }}
+                      <a href="{{ .RelPermalink }}" class="tag-pill">{{ .LinkTitle }}</a>
+                    {{- end }}
+                  {{- end }}
+                {{- end }}
+              </div>
+            {{- end }}
+          {{- end }}
+
           <div class="single-meta">
             {{- $dateFormat := .Language.Params.dateFormat | default "2 Jan 2006" }}
             {{- if .Params.showDate | default true }}
@@ -99,42 +121,6 @@
           {{- end }}
         </div>
 
-        {{- /* Tags */}}
-        {{- $showTaxonomies := .Params.showTaxonomies | default true }}
-        {{- if $showTaxonomies }}
-          {{- $hasTags := false }}
-          {{- range $taxonomy, $terms := .Site.Taxonomies }}
-            {{- if and (ne $taxonomy "categories") (gt (len ($.GetTerms $taxonomy)) 0) }}
-              {{- $hasTags = true }}
-            {{- end }}
-          {{- end }}
-          {{- if $hasTags }}
-            <div class="tag-list" style="margin-top:32px; padding-top:24px; border-top:0.5px solid var(--color-border);">
-              {{- range $taxonomy, $terms := .Site.Taxonomies }}
-                {{- if and (ne $taxonomy "categories") (gt (len ($.GetTerms $taxonomy)) 0) }}
-                  {{- range $.GetTerms $taxonomy }}
-                    <a href="{{ .RelPermalink }}" class="tag-pill">{{ .LinkTitle }}</a>
-                  {{- end }}
-                {{- end }}
-              {{- end }}
-            </div>
-          {{- end }}
-        {{- end }}
-
-        {{- /* Article pagination */}}
-        <nav style="display:flex; justify-content:space-between; margin-top:48px; padding-top:24px; border-top:0.5px solid var(--color-border);">
-          {{- with .PrevInSection }}
-            <a href="{{ .RelPermalink }}" style="color:var(--color-text-secondary); text-decoration:none; font-size:14px;">
-              &larr; {{ .Title | truncate 40 }}
-            </a>
-          {{- end }}
-          <span></span>
-          {{- with .NextInSection }}
-            <a href="{{ .RelPermalink }}" style="color:var(--color-text-secondary); text-decoration:none; font-size:14px;">
-              {{ .Title | truncate 40 }} &rarr;
-            </a>
-          {{- end }}
-        </nav>
       </article>
 
       {{- /* TOC toggle script */}}
@@ -144,25 +130,46 @@
             var tocToggle = document.querySelector('[data-toc-toggle]');
             var tocCol = document.querySelector('[data-toc-col]');
             if (!tocToggle || !tocCol) return;
+
             var STORAGE_KEY = 'toc-collapsed';
             function getState() { try { return sessionStorage.getItem(STORAGE_KEY) === 'true'; } catch(e) { return false; } }
             function saveState(c) { try { sessionStorage.setItem(STORAGE_KEY, c ? 'true' : 'false'); } catch(e) {} }
             var collapsed = getState();
-            function apply() {
-              if (window.innerWidth >= 1024) {
+
+            function applyCollapse() {
+              if (window.innerWidth >= 1280) {
                 tocCol.querySelector('.toc-wrapper').classList.toggle('toc-collapsed', collapsed);
               } else {
                 tocCol.querySelector('.toc-wrapper').classList.remove('toc-collapsed');
               }
             }
+
             tocToggle.addEventListener('click', function() {
-              if (window.innerWidth < 1024) return;
+              if (window.innerWidth < 1280) return;
               collapsed = !collapsed;
               saveState(collapsed);
-              apply();
+              applyCollapse();
             });
-            apply();
-            window.addEventListener('resize', apply);
+
+            // Hide TOC when scrolled to footer
+            var footer = document.querySelector('.site-footer');
+            function checkFooter() {
+              if (!footer || window.innerWidth < 1280) return;
+              var footerTop = footer.getBoundingClientRect().top;
+              var tocBottom = tocCol.getBoundingClientRect().bottom;
+              if (footerTop <= tocBottom + 32) {
+                tocCol.style.opacity = '0';
+                tocCol.style.pointerEvents = 'none';
+              } else {
+                tocCol.style.opacity = '1';
+                tocCol.style.pointerEvents = 'auto';
+              }
+            }
+
+            applyCollapse();
+            checkFooter();
+            window.addEventListener('scroll', checkFooter, { passive: true });
+            window.addEventListener('resize', function() { applyCollapse(); checkFooter(); });
           })();
         </script>
       {{- end }}

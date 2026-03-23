@@ -14,9 +14,8 @@
     <div class="single-meta-item">
       <i class="ti ti-clock"></i>
       <span>
-        {{ i18n "course_duration_label" }}:
-        {{- if gt $hours 0 }} {{ $hours }}{{ i18n "duration_hours" }}{{ end }}
-        {{- if gt $minutes 0 }} {{ $minutes }}{{ i18n "duration_minutes" }}{{ end }}
+        {{- if gt $hours 0 }} {{ $hours }}h{{ end }}
+        {{- if gt $minutes 0 }} {{ $minutes }}m{{ end }}
       </span>
     </div>
   {{- end }}
