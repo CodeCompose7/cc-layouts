@@ -1,0 +1,34 @@
+{{- $context := . }}
+{{- $linkUrl := $context.RelPermalink }}
+<a href="{{ $linkUrl }}" class="article-card">
+  {{- $isCourse := eq $context.Section "courses" }}
+
+  <div class="article-card-title">
+    {{- if $isCourse }}
+      <span class="tag-pill" style="margin-right:4px;">{{ i18n "content_type_course" }}</span>
+    {{- end }}
+    {{ $context.Title | emojify }}
+  </div>
+
+  {{- if $isCourse }}
+    <div class="course-card-meta" style="margin-top:4px;">
+      {{ partial "difficulty-stars.html" $context }}
+      {{ partial "course-duration-inline.html" $context }}
+    </div>
+  {{- end }}
+
+  <div class="article-card-meta">
+    {{- $dateFormat := $context.Language.Params.dateFormat | default "2 Jan 2006" }}
+    {{ $context.Date.Format $dateFormat }}
+  </div>
+
+  <div class="tag-list">
+    {{- range $taxonomy, $terms := $context.Site.Taxonomies }}
+      {{- if and (ne $taxonomy "categories") (gt (len ($context.GetTerms $taxonomy)) 0) }}
+        {{- range $context.GetTerms $taxonomy }}
+          <span class="tag-pill">{{ .LinkTitle }}</span>
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  </div>
+</a>

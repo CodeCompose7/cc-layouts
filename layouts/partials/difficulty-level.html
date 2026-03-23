@@ -1,0 +1,9 @@
+{{- $context := . }}
+{{- $level := $context.Params.level | default 0 }}
+{{- if and (ge $level 1) (le $level 5) }}
+  <div class="single-meta-item">
+    <i class="ti ti-star"></i>
+    <span>{{ i18n (printf "difficulty_level_%d" $level) }}</span>
+    {{ partial "difficulty-stars-inline.html" $context }}
+  </div>
+{{- end }}

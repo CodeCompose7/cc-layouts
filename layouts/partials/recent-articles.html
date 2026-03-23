@@ -1,0 +1,23 @@
+{{- if .Site.Params.homepage.showRecent | default false }}
+  {{- $sectionList := .Site.Params.homepage.showRecentFolders | default (slice) }}
+  {{- if gt (len $sectionList) 0 }}
+    {{- $pages := where .Site.RegularPages "Section" "in" $sectionList }}
+    {{- if not .Site.BuildDrafts }}
+      {{- $pages = where $pages "Draft" "!=" true }}
+    {{- end }}
+    {{- $recentLimit := .Site.Params.homepage.recentLimit | default 5 }}
+    {{- $pages = first $recentLimit ($pages.ByDate.Reverse) }}
+    {{- if gt (len $pages) 0 }}
+      <section class="recent-articles" style="margin-top:48px;">
+        <h2 style="font-size:24px; font-weight:700; margin-bottom:24px;">
+          {{ i18n "recent_articles_title" }}
+        </h2>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          {{- range $pages }}
+            {{ partial "article-card.html" . }}
+          {{- end }}
+        </div>
+      </section>
+    {{- end }}
+  {{- end }}
+{{- end }}

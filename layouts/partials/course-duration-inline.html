@@ -1,0 +1,30 @@
+{{- $context := . }}
+{{- $raw := $context.Params.hours | default "" }}
+{{- if $raw }}
+  {{- $parts := split $raw ":" }}
+  {{- $hours := 0 }}
+  {{- $minutes := 0 }}
+  {{- if ge (len $parts) 1 }}
+    {{- $hours = int (index $parts 0) }}
+  {{- end }}
+  {{- if ge (len $parts) 2 }}
+    {{- $minutes = int (index $parts 1) }}
+  {{- end }}
+  {{- if or (gt $hours 0) (gt $minutes 0) }}
+    {{- $duration := "" }}
+    {{- if gt $hours 0 }}
+      {{- $duration = printf "%dh" $hours }}
+    {{- end }}
+    {{- if gt $minutes 0 }}
+      {{- if gt $hours 0 }}
+        {{- $duration = printf "%s %dm" $duration $minutes }}
+      {{- else }}
+        {{- $duration = printf "%dm" $minutes }}
+      {{- end }}
+    {{- end }}
+    <span class="duration-badge">
+      <i class="ti ti-clock"></i>
+      {{ $duration }}
+    </span>
+  {{- end }}
+{{- end }}

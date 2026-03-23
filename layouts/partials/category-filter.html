@@ -1,0 +1,97 @@
+{{- $context := .context | default . }}
+{{- $currentCategory := .currentCategory | default "" }}
+{{- $sectionName := .section | default ($context.Section | default "blog") }}
+
+{{- $blogSection := .blogSection }}
+{{- if and $blogSection (eq $blogSection $context) }}
+  {{- $blogSection = false }}
+{{- end }}
+{{- if not $blogSection }}
+  {{- $currentLang := $context.Language.Lang | default "ko" }}
+  {{- $blogPath := printf "/%s/%s" $currentLang $sectionName }}
+  {{- $foundSection := $context.Site.GetPage $blogPath }}
+  {{- if and $foundSection (ne $foundSection $context) }}
+    {{- $blogSection = $foundSection }}
+  {{- end }}
+{{- end }}
+{{- if not $blogSection }}
+  {{- $foundSection := $context.Site.GetPage (printf "/%s" $sectionName) }}
+  {{- if and $foundSection (ne $foundSection $context) }}
+    {{- $blogSection = $foundSection }}
+  {{- end }}
+{{- end }}
+{{- if not $blogSection }}
+  {{- $foundSection := $context.Site.GetPage "section" $sectionName }}
+  {{- if and $foundSection (ne $foundSection $context) }}
+    {{- $blogSection = $foundSection }}
+  {{- end }}
+{{- end }}
+
+{{- $isLocal := hugo.IsServer }}
+
+{{- $allPages := slice }}
+{{- $allPagesWithDrafts := slice }}
+{{- if $blogSection }}
+  {{- $allPagesWithDrafts = $blogSection.RegularPagesRecursive }}
+  {{- $allPages = where $allPagesWithDrafts "Draft" "!=" true }}
+{{- else }}
+  {{- if $context.Section }}
+    {{- $sectionPage := $context.Site.GetPage (printf "/%s" $context.Section) }}
+    {{- if $sectionPage }}
+      {{- $allPagesWithDrafts = $sectionPage.RegularPagesRecursive }}
+      {{- $allPages = where $allPagesWithDrafts "Draft" "!=" true }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- $totalCount := len $allPages }}
+{{- $totalCountWithDrafts := len $allPagesWithDrafts }}
+
+{{- $allCategories := slice }}
+{{- range $allPagesWithDrafts }}
+  {{- with .Params.categories }}
+    {{- range . }}
+      {{- if not (in $allCategories .) }}
+        {{- $allCategories = $allCategories | append . }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if $allCategories }}
+  <div class="category-filter">
+    {{- $blogHref := "" }}
+    {{- if $blogSection }}
+      {{- $blogHref = $blogSection.RelPermalink }}
+    {{- else }}
+      {{- $currentLang := $context.Language.Lang | default "ko" }}
+      {{- $blogHref = printf "/%s/%s/" $currentLang $sectionName }}
+    {{- end }}
+    <a href="{{ $blogHref }}" class="category-filter-btn {{ if eq $currentCategory "" }}active{{ end }}">
+      {{ i18n "category_filter_all" }}
+      <span class="category-filter-count">
+        {{- if $isLocal }}({{ $totalCount }}/{{ $totalCountWithDrafts }})
+        {{- else }}({{ $totalCount }})
+        {{- end }}
+      </span>
+    </a>
+
+    {{- range $index, $term := $allCategories }}
+      {{- $termPage := $context.Site.GetPage (printf "/%s/_categories/%s" $sectionName $term) }}
+      {{- if $termPage }}
+        {{- $categoryPagesWithDrafts := where $allPagesWithDrafts "Params.categories" "intersect" (slice $term) }}
+        {{- $categoryPages := where $categoryPagesWithDrafts "Draft" "!=" true }}
+        {{- $categoryCount := len $categoryPages }}
+        {{- if gt $categoryCount 0 }}
+          <a href="{{ $termPage.RelPermalink }}" class="category-filter-btn {{ if eq $currentCategory $term }}active{{ end }}">
+            {{ $termPage.LinkTitle }}
+            <span class="category-filter-count">
+              {{- if $isLocal }}({{ $categoryCount }}/{{ len $categoryPagesWithDrafts }})
+              {{- else }}({{ $categoryCount }})
+              {{- end }}
+            </span>
+          </a>
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  </div>
+{{- end }}

@@ -1,0 +1,62 @@
+{{- $context := . }}
+{{- $linkUrl := cond $context.Params.externalUrl $context.Params.externalUrl $context.RelPermalink }}
+<a href="{{ $linkUrl }}" class="article-card">
+  {{- $images := $context.Resources.ByType "image" }}
+  {{- $feature := $images.GetMatch ($context.Params.feature | default "*feature*") }}
+  {{- $showFeatureOnList := $context.Params.featureImgOnList | default false }}
+  {{- if and $feature $showFeatureOnList }}
+    <div class="article-card-image">
+      {{ if eq $feature.MediaType.SubType "svg" }}
+        <img alt="{{ $context.Params.featureAlt | default "" }}" src="{{ $feature.RelPermalink }}" loading="lazy" />
+      {{ else }}
+        <img
+          alt="{{ $context.Params.featureAlt | default "" }}"
+          srcset="{{ ($feature.Fill "400x225 smart").RelPermalink }} 400w, {{ ($feature.Fill "800x450 smart").RelPermalink }} 2x"
+          src="{{ ($feature.Fill "400x225 smart").RelPermalink }}" width="400" height="225"
+          loading="lazy"
+        />
+      {{ end }}
+    </div>
+  {{- end }}
+
+  <div class="article-card-title">
+    {{- if $context.Draft }}
+      <span class="draft-label">{{ i18n "draft_label" }}</span>
+    {{- end }}
+    {{ $context.Title | emojify }}
+    {{- with $context.Params.externalUrl }}
+      <span style="font-size:12px; color:var(--color-text-tertiary);">&#8599;</span>
+    {{- end }}
+  </div>
+
+  <div class="article-card-meta">
+    {{- $dateFormat := $context.Site.Params.dateFormat | default ($context.Language.Params.dateFormat | default "2 Jan 2006") }}
+    {{- $dateStr := $context.Date.Format $dateFormat }}
+    {{- $lastStr := $context.Lastmod.Format $dateFormat }}
+    {{- if ne $dateStr $lastStr }}
+      {{ i18n "course_updated_at_label" }} {{ $lastStr }}
+    {{- else }}
+      {{ $dateStr }}
+    {{- end }}
+    {{- $version := $context.Params.version | default 1 }}
+    {{- if ne $version 1 }}
+      · v{{ $version }}
+    {{- end }}
+  </div>
+
+  <div class="tag-list">
+    {{- range $taxonomy, $terms := $context.Site.Taxonomies }}
+      {{- if and (ne $taxonomy "categories") (gt (len ($context.GetTerms $taxonomy)) 0) }}
+        {{- range $context.GetTerms $taxonomy }}
+          <span class="tag-pill" onclick="event.preventDefault(); window.location.href='{{ .RelPermalink }}';">{{ .LinkTitle }}</span>
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  </div>
+
+  {{- if $context.Params.showSummary | default false }}
+    <div class="article-card-summary">
+      {{ $context.Summary | plainify }}
+    </div>
+  {{- end }}
+</a>

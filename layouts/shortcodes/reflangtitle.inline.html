@@ -1,36 +1,7 @@
-{{- $path := .Get "path" -}}
-{{- if not $path }}{{ errorf "reflangtitle shortcode: path is required" }}{{- end -}}
-{{- $lang := .Get "lang" | default (.Page.Language.Lang | default "ko") -}}
-{{- $page := false -}}
-{{- $langPath := printf "/%s/%s" $lang $path -}}
-{{- $foundPage := .Page.Site.GetPage $langPath -}}
-{{- if and $foundPage (ne $foundPage .Page) -}}
-  {{- $page = $foundPage -}}
-{{- end -}}
-{{- if not $page -}}
-  {{- $foundPage := .Page.Site.GetPage (printf "/%s" $path) -}}
-  {{- if and $foundPage (ne $foundPage .Page) -}}
-    {{- $page = $foundPage -}}
+{{- $ref := "" -}}
+{{- with .Get "path" }}{{ $ref = . }}{{ else }}{{ with .Get 0 }}{{ $ref = . }}{{ end }}{{ end -}}
+{{- if ne $ref "" -}}
+  {{- with $.Page.GetPage $ref -}}
+    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
   {{- end -}}
 {{- end -}}
-{{- if not $page -}}
-  {{- errorf "reflangtitle shortcode: page not found for path '%s' with lang '%s'" $path $lang -}}
-{{- end -}}
-{{- $targetPage := $page -}}
-{{- $targetTitle := $page.Title -}}
-{{- $targetLink := $page.RelPermalink -}}
-{{- if hugo.IsMultilingual -}}
-  {{- $langPage := false -}}
-  {{- range $page.Translations -}}
-    {{- if eq .Language.Lang $lang -}}
-      {{- $langPage = . -}}
-    {{- end -}}
-  {{- end -}}
-  {{- if $langPage -}}
-    {{- $targetPage = $langPage -}}
-    {{- $targetTitle = $langPage.Title -}}
-    {{- $targetLink = $langPage.RelPermalink -}}
-  {{- else if ne $page.Language.Lang $lang -}}
-    {{- warnf "reflangtitle shortcode: translation not found for path '%s' with lang '%s', using default language" $path $lang -}}
-  {{- end -}}
-{{- end -}}<a href="{{ $targetLink }}">{{ $targetTitle }}</a>
