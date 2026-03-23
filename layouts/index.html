@@ -2,7 +2,12 @@
 <div class="hero">
   {{- with .Site.Params.author }}
     {{- with .image }}
-      <img src="{{ . | absURL }}" alt="{{ $.Site.Title }}" class="hero-profile-image" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:24px; border:2px solid var(--color-border);">
+      {{- $img := resources.Get . }}
+      {{- if $img }}
+        <img src="{{ $img.RelPermalink }}" alt="{{ $.Site.Title }}" class="hero-profile-image" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:24px; border:2px solid var(--color-border);">
+      {{- else }}
+        <img src="{{ . | absURL }}" alt="{{ $.Site.Title }}" class="hero-profile-image" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:24px; border:2px solid var(--color-border);">
+      {{- end }}
     {{- end }}
   {{- end }}
   <h1>{{ .Site.Title }}</h1>
