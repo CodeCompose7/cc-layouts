@@ -49,16 +49,18 @@
     }
 
     var langToggle = document.getElementById('lang-toggle');
-    var langMenu = document.getElementById('lang-menu');
-    if (langToggle && langMenu) {
+    var langDropdown = langToggle ? langToggle.closest('.lang-dropdown') : null;
+    if (langToggle && langDropdown) {
       langToggle.addEventListener('click', function (e) {
+        e.preventDefault();
         e.stopPropagation();
-        var isOpen = langMenu.classList.toggle('lang-menu--open');
-        langToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        langDropdown.classList.toggle('open');
+      });
+      langDropdown.addEventListener('click', function (e) {
+        e.stopPropagation();
       });
       document.addEventListener('click', function () {
-        langMenu.classList.remove('lang-menu--open');
-        langToggle.setAttribute('aria-expanded', 'false');
+        langDropdown.classList.remove('open');
       });
     }
   })();

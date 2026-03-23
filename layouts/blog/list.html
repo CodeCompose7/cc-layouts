@@ -16,7 +16,7 @@
   {{- end }}
 
   {{- if gt (len $allPages) 0 }}
-    <section>
+    <section id="blog-list">
       {{- $currentCategory := "" }}
       {{- if and (eq $currentCategory "") .RelPermalink }}
         {{- if in .RelPermalink "/_categories/" }}
