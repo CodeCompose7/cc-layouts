@@ -98,8 +98,8 @@
   --color-text-tertiary: #aeaeb2;
   --color-accent: #3478f6;
   --color-border: #d2d2d7;
-  --font-sans: 'AstaSans', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-  --font-body: 'Pretendard', 'AstaSans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'AstaSans', 'Pretendard', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --font-body: 'AstaSans', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   --max-width: 980px;
   --section-padding: 40px 0;
   --nav-height: 52px;
@@ -215,7 +215,7 @@ main {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 17px;
   color: var(--color-text);
   text-decoration: none;
