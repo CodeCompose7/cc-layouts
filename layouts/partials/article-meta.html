@@ -1,0 +1,24 @@
+{{- $context := .context | default . }}
+{{- $scope := .scope | default "list" }}
+{{- $dateFormat := $context.Language.Params.dateFormat | default "2 Jan 2006" }}
+
+{{- if $context.Params.showDate | default true }}
+  <span class="single-meta-item">
+    <i class="ti ti-calendar"></i>
+    {{ $context.Date.Format $dateFormat }}
+  </span>
+{{- end }}
+
+{{- if and ($context.Params.showDateUpdated | default false) (ne ($context.Date.Format $dateFormat) ($context.Lastmod.Format $dateFormat)) }}
+  <span class="single-meta-item">
+    <i class="ti ti-edit"></i>
+    {{ $context.Lastmod.Format $dateFormat }}
+  </span>
+{{- end }}
+
+{{- if and ($context.Params.showReadingTime | default true) (ne $context.ReadingTime 0) }}
+  <span class="single-meta-item">
+    <i class="ti ti-book"></i>
+    {{ $context.ReadingTime }}{{ if eq $context.Lang "ko" }}분{{ else }} min{{ end }}
+  </span>
+{{- end }}

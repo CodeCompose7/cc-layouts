@@ -1,0 +1,14 @@
+{{- $context := . }}
+{{- $level := $context.Params.level | default 0 }}
+{{- if gt $level 0 }}
+  {{- $max := 5 }}
+  <span class="difficulty-badge" aria-label="{{ printf "Level %d/%d" $level $max }}">
+    {{- range seq 1 $max }}
+      {{- if le . $level }}
+        <span class="difficulty-star">★</span>
+      {{- else }}
+        <span class="difficulty-star-empty">☆</span>
+      {{- end }}
+    {{- end }}
+  </span>
+{{- end }}

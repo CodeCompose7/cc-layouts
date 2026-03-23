@@ -1,0 +1,18 @@
+{{ define "main" }}
+<div class="section">
+  <header class="single-header">
+    <h1 class="single-title">{{ .Title }}</h1>
+  </header>
+  {{- if .Content }}
+    <div class="content-body" style="margin-bottom:32px;">
+      {{ .Content | emojify }}
+    </div>
+  {{- end }}
+  {{- range .Pages }}
+    <div style="margin-bottom:16px;">
+      <a href="{{ .RelPermalink }}" style="font-size:18px; font-weight:500;">{{ .Title }}</a>
+      <p style="font-size:14px; color:var(--color-text-secondary);">{{ .Summary | plainify | truncate 120 }}</p>
+    </div>
+  {{- end }}
+</div>
+{{ end }}

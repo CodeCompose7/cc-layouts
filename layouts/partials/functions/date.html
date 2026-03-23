@@ -1,0 +1,4 @@
+{{- $date := . }}
+{{- if $date }}
+  {{- $date.Format (site.Params.dateFormat | default (site.Language.Params.dateFormat | default "2 Jan 2006")) }}
+{{- end }}

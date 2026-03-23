@@ -1,0 +1,65 @@
+{{ $currentPage := . }}
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="/{{ .Lang }}/">
+      <img src="/img/logo.png" alt="{{ .Site.Title }} logo">
+      <span class="nav-site-title">{{ .Site.Title }}</span>
+    </a>
+
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle navigation">
+      <i class="ti ti-menu-2"></i>
+    </button>
+
+    <ul class="nav-links" id="nav-links">
+      {{ range .Site.Menus.main }}
+        {{ if and (ne .Identifier "search") (ne .Identifier "locale") }}
+          <li>
+            <a href="{{ with .Page }}{{ .RelPermalink }}{{ else }}{{ .URL }}{{ end }}" {{ if or ($currentPage.IsMenuCurrent "main" .) ($currentPage.HasMenuCurrent "main" .) }}class="active"{{ end }}>
+              {{ .Name }}
+            </a>
+          </li>
+        {{ end }}
+      {{ end }}
+
+      <li class="lang-dropdown">
+        <button class="lang-current" id="lang-toggle" aria-expanded="false">
+          <i class="ti ti-language"></i>
+          {{ .Site.Language.LanguageName }}
+          <i class="ti ti-chevron-down lang-arrow"></i>
+        </button>
+        <ul class="lang-menu" id="lang-menu">
+          {{ range .AllTranslations }}
+          <li><a href="{{ .RelPermalink }}" {{ if eq .Lang $.Lang }}class="active"{{ end }}>{{ .Language.LanguageName }}</a></li>
+          {{ end }}
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<script>
+  (function () {
+    var hamburger = document.getElementById('nav-hamburger');
+    var navLinks = document.getElementById('nav-links');
+    if (hamburger && navLinks) {
+      hamburger.addEventListener('click', function () {
+        var isOpen = navLinks.classList.toggle('nav-links--open');
+        hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+    }
+
+    var langToggle = document.getElementById('lang-toggle');
+    var langMenu = document.getElementById('lang-menu');
+    if (langToggle && langMenu) {
+      langToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var isOpen = langMenu.classList.toggle('lang-menu--open');
+        langToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+      document.addEventListener('click', function () {
+        langMenu.classList.remove('lang-menu--open');
+        langToggle.setAttribute('aria-expanded', 'false');
+      });
+    }
+  })();
+</script>

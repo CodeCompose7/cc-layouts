@@ -1,18 +1,16 @@
-{{- $url := .Get "url" -}}
-{{- if not $url }}{{ errorf "bookmark shortcode: url is required" }}{{- end }}
-{{- $title := .Get "title" | default $url -}}
-{{- $desc := .Get "desc" | default "" -}}
-{{- $icon := .Get "icon" | default "" -}}
-{{- $type := .Get "type" | default "" -}}
-
-{{- if eq $type "" }}
-  {{- if in $url "github.com" }}
-    {{- $type = "github" -}}
-  {{- else }}
-    {{- $type = "link" -}}
+{{- $url := .Get "url" | default (.Get 0) }}
+{{- $title := .Get "title" | default $url }}
+{{- $description := .Get "description" | default "" }}
+{{- $icon := .Get "icon" | default "" }}
+<a href="{{ $url }}" class="bookmark-card" target="_blank" rel="noopener">
+  {{- if $icon }}
+    <img src="{{ $icon }}" alt="" class="bookmark-card-icon" />
   {{- end }}
-{{- end }}
-
-{{- $data := dict "url" $url "title" $title "desc" $desc "icon" $icon -}}
-{{- partial (printf "bookmark/%s.html" $type) $data -}}
-
+  <div class="bookmark-card-content">
+    <div class="bookmark-card-title">{{ $title }}</div>
+    {{- if $description }}
+      <div class="bookmark-card-desc">{{ $description }}</div>
+    {{- end }}
+    <div class="bookmark-card-url">{{ $url }}</div>
+  </div>
+</a>

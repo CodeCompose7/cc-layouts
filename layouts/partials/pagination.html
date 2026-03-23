@@ -1,0 +1,39 @@
+{{- with .Paginator }}
+  {{- $width := 1 }}
+  {{- $currentPageNumber := .PageNumber }}
+  {{- if gt .TotalPages 1 }}
+    {{- $start := math.Max 1 (sub .PageNumber $width) }}
+    {{- $end := math.Min .TotalPages (add $start (mul $width 2)) }}
+    <div class="pagination">
+      {{- with .Prev }}
+        <a href="{{ .URL }}" aria-label="Previous page" rel="prev">&larr;</a>
+      {{- end }}
+      {{- with .First }}
+        {{- if gt $currentPageNumber (add 1 $width) }}
+          <a href="{{ .URL }}" aria-label="First page">{{ .PageNumber }}</a>
+          {{- if gt $currentPageNumber (add 2 $width) }}
+            <span class="ellipsis">&ctdot;</span>
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- range $i := seq $start $end }}
+        {{- if eq $.Paginator.PageNumber $i }}
+          <span class="active" aria-current="page" aria-label="Page {{ $i }}">{{ $i }}</span>
+        {{- else }}
+          <a href="{{ (index $.Paginator.Pagers (sub $i 1)).URL }}" aria-label="Page {{ $i }}">{{ $i }}</a>
+        {{- end }}
+      {{- end }}
+      {{- with .Last }}
+        {{- if and (lt $currentPageNumber (sub .TotalPages $width)) (lt $end .TotalPages) }}
+          {{- if lt $currentPageNumber (sub .TotalPages (add $width 1)) }}
+            <span class="ellipsis">&ctdot;</span>
+          {{- end }}
+          <a href="{{ .URL }}" aria-label="Last page">{{ .PageNumber }}</a>
+        {{- end }}
+      {{- end }}
+      {{- with .Next }}
+        <a href="{{ .URL }}" aria-label="Next page" rel="next">&rarr;</a>
+      {{- end }}
+    </div>
+  {{- end }}
+{{- end }}

@@ -1,0 +1,11 @@
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="/{{ .Lang }}/">{{ i18n "breadcrumb_home" }}</a>
+  {{- range .Ancestors.Reverse }}
+    {{- if not .IsHome }}
+      <span class="separator">/</span>
+      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+    {{- end }}
+  {{- end }}
+  <span class="separator">/</span>
+  <span>{{ .Title | truncate 40 }}</span>
+</nav>

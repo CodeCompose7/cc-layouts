@@ -1,0 +1,23 @@
+{{- $context := . }}
+{{- $raw := $context.Params.hours | default "" }}
+{{- if $raw }}
+  {{- $parts := split $raw ":" }}
+  {{- $hours := 0 }}
+  {{- $minutes := 0 }}
+  {{- if ge (len $parts) 1 }}
+    {{- $hours = int (index $parts 0) }}
+  {{- end }}
+  {{- if ge (len $parts) 2 }}
+    {{- $minutes = int (index $parts 1) }}
+  {{- end }}
+  {{- if or (gt $hours 0) (gt $minutes 0) }}
+    <div class="single-meta-item">
+      <i class="ti ti-clock"></i>
+      <span>
+        {{ i18n "course_duration_label" }}:
+        {{- if gt $hours 0 }} {{ $hours }}{{ i18n "duration_hours" }}{{ end }}
+        {{- if gt $minutes 0 }} {{ $minutes }}{{ i18n "duration_minutes" }}{{ end }}
+      </span>
+    </div>
+  {{- end }}
+{{- end }}

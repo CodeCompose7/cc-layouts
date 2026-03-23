@@ -1,0 +1,88 @@
+{{- $context := . }}
+{{- $linkUrl := cond $context.Params.externalUrl $context.Params.externalUrl $context.RelPermalink }}
+{{- $images := $context.Resources.ByType "image" }}
+{{- $thumbnail := $images.GetMatch ($context.Params.thumbnail | default "*thumb*") }}
+{{- $feature := $images.GetMatch ($context.Params.feature | default "*feature*") | default $thumbnail }}
+{{- if and (not $feature) $context.Params.feature }}
+  {{- $feature = resources.Get $context.Params.feature }}
+{{- end }}
+{{- $defaultImage := "img/course/default_course.jpg" }}
+{{- $defaultImageResource := resources.Get $defaultImage }}
+
+<a href="{{ $linkUrl }}" class="course-card">
+  {{- /* Image section */}}
+  {{- if $feature }}
+    <div class="course-card-image">
+      <img
+        alt="{{ $context.Params.featureAlt | default $context.Title }}"
+        {{ if eq $feature.MediaType.SubType "svg" }}
+          src="{{ $feature.RelPermalink }}"
+        {{ else }}
+          srcset="{{ ($feature.Fill "320x240 smart").RelPermalink }} 320w, {{ ($feature.Fill "640x480 smart").RelPermalink }} 640w, {{ ($feature.Fill "800x600 smart").RelPermalink }} 800w"
+          src="{{ ($feature.Fill "640x480 smart").RelPermalink }}" width="640" height="480"
+        {{ end }}
+        loading="lazy"
+      />
+    </div>
+  {{- else if $defaultImageResource }}
+    <div class="course-card-image">
+      <img
+        alt="{{ $context.Title }}"
+        srcset="{{ ($defaultImageResource.Fill "320x240 smart").RelPermalink }} 320w, {{ ($defaultImageResource.Fill "640x480 smart").RelPermalink }} 640w"
+        src="{{ ($defaultImageResource.Fill "640x480 smart").RelPermalink }}" width="640" height="480"
+        loading="lazy"
+      />
+    </div>
+  {{- end }}
+
+  <div class="course-card-content">
+    {{- /* Title with difficulty stars and duration */}}
+    <div class="course-card-title">
+      {{- if $context.Draft }}
+        <span class="draft-label">{{ i18n "draft_label" }}</span>
+      {{- end }}
+      <span class="course-card-meta">
+        {{ partial "difficulty-stars.html" $context }}
+        {{ partial "course-duration-inline.html" $context }}
+      </span>
+      <span>{{ $context.Title | emojify }}</span>
+      {{- with $context.Params.externalUrl }}
+        <span style="font-size:12px; color:var(--color-text-tertiary);">&#8599;</span>
+      {{- end }}
+    </div>
+
+    {{- /* Date and version meta */}}
+    <div class="article-card-meta">
+      {{- $dateFormat := $context.Site.Params.dateFormat | default ($context.Language.Params.dateFormat | default "2 Jan 2006") }}
+      {{- $dateStr := $context.Date.Format $dateFormat }}
+      {{- $lastStr := $context.Lastmod.Format $dateFormat }}
+      {{- if ne $dateStr $lastStr }}
+        {{ i18n "course_updated_at_label" }} {{ $lastStr }}
+      {{- else }}
+        {{ i18n "course_uploaded_at_label" }} {{ $dateStr }}
+      {{- end }}
+      {{- $version := $context.Params.version | default 1 }}
+      {{- if ne $version 1 }}
+        · {{ i18n "course_version_label" }} v{{ $version }}
+      {{- end }}
+    </div>
+
+    {{- /* Tags */}}
+    <div class="tag-list">
+      {{- range $taxonomy, $terms := $context.Site.Taxonomies }}
+        {{- if and (ne $taxonomy "categories") (gt (len ($context.GetTerms $taxonomy)) 0) }}
+          {{- range $context.GetTerms $taxonomy }}
+            <span class="tag-pill" onclick="event.preventDefault(); window.location.href='{{ .RelPermalink }}';">{{ .LinkTitle }}</span>
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    </div>
+
+    {{- /* Summary */}}
+    {{- if $context.Params.showSummary | default false }}
+      <div class="course-card-summary">
+        {{ $context.Summary | plainify }}
+      </div>
+    {{- end }}
+  </div>
+</a>
