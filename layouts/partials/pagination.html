@@ -1,0 +1,63 @@
+{{- with .Paginator }}
+  {{- $width := 1 }}
+  {{- $currentPageNumber := .PageNumber }}
+  {{- if gt .TotalPages 1 }}
+    {{- $start := math.Max 1 (sub .PageNumber $width) }}
+    {{- $end := math.Min .TotalPages (add $start (mul $width 2)) }}
+    <div class="pagination">
+      {{- with .Prev }}
+        <a href="{{ .URL }}" aria-label="Previous page" rel="prev" data-pager>&larr;</a>
+      {{- end }}
+      {{- with .First }}
+        {{- if gt $currentPageNumber (add 1 $width) }}
+          <a href="{{ .URL }}" aria-label="First page" data-pager>{{ .PageNumber }}</a>
+          {{- if gt $currentPageNumber (add 2 $width) }}
+            <span class="ellipsis">&ctdot;</span>
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- range $i := seq $start $end }}
+        {{- if eq $.Paginator.PageNumber $i }}
+          <span class="active" aria-current="page" aria-label="Page {{ $i }}">{{ $i }}</span>
+        {{- else }}
+          <a href="{{ (index $.Paginator.Pagers (sub $i 1)).URL }}" aria-label="Page {{ $i }}" data-pager>{{ $i }}</a>
+        {{- end }}
+      {{- end }}
+      {{- with .Last }}
+        {{- if and (lt $currentPageNumber (sub .TotalPages $width)) (lt $end .TotalPages) }}
+          {{- if lt $currentPageNumber (sub .TotalPages (add $width 1)) }}
+            <span class="ellipsis">&ctdot;</span>
+          {{- end }}
+          <a href="{{ .URL }}" aria-label="Last page" data-pager>{{ .PageNumber }}</a>
+        {{- end }}
+      {{- end }}
+      {{- with .Next }}
+        <a href="{{ .URL }}" aria-label="Next page" rel="next" data-pager>&rarr;</a>
+      {{- end }}
+    </div>
+    <script>
+      // On page load from pagination, scroll instantly to blog list (no animation)
+      (function() {
+        if (sessionStorage.getItem('pager-scroll')) {
+          sessionStorage.removeItem('pager-scroll');
+          var el = document.getElementById('blog-list');
+          if (el) {
+            // Disable smooth scroll temporarily
+            document.documentElement.style.scrollBehavior = 'auto';
+            el.scrollIntoView();
+            // Re-enable after scroll
+            requestAnimationFrame(function() {
+              document.documentElement.style.scrollBehavior = '';
+            });
+          }
+        }
+        // Set flag when clicking pagination links
+        document.querySelectorAll('[data-pager]').forEach(function(a) {
+          a.addEventListener('click', function() {
+            sessionStorage.setItem('pager-scroll', '1');
+          });
+        });
+      })();
+    </script>
+  {{- end }}
+{{- end }}

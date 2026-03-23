@@ -1,0 +1,36 @@
+{{ define "main" }}
+<div class="hero">
+  {{- with .Site.Params.author }}
+    {{- with .image }}
+      <img src="{{ . | absURL }}" alt="{{ $.Site.Title }}" class="hero-profile-image" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:24px; border:2px solid var(--color-border);">
+    {{- end }}
+  {{- end }}
+  <h1>{{ .Site.Title }}</h1>
+  {{- with .Site.Params.author }}
+    <p class="subtitle">{{ .headline | markdownify }}</p>
+  {{- end }}
+  {{- with .Site.Params.author.links }}
+    <div class="btn-group" style="margin-top:16px;">
+      {{- range . }}
+        {{- range $key, $val := . }}
+          {{- if eq $key "github" }}
+            <a href="{{ $val }}" class="btn btn-secondary btn-sm" target="_blank"><i class="ti ti-brand-github"></i> GitHub</a>
+          {{- else if eq $key "email" }}
+            <a href="{{ $val }}" class="btn btn-secondary btn-sm"><i class="ti ti-mail"></i> Email</a>
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    </div>
+  {{- end }}
+</div>
+
+<div class="section">
+  {{- if .Content }}
+    <div class="content-body">
+      {{ .Content }}
+    </div>
+  {{- end }}
+
+  {{ partial "recent-articles.html" . }}
+</div>
+{{ end }}

@@ -1,0 +1,22 @@
+{{- $context := .context }}
+{{- $pages := .pages }}
+{{- $sidebarImage := $context.Params.sidebarImage | default "" }}
+{{- $sidebarText := $context.Params.sidebarText | default "" }}
+{{- $hasSidebar := or (ne $sidebarImage "") (ne $sidebarText "") }}
+
+{{- if $hasSidebar }}
+  <div class="blog-with-sidebar">
+    {{ partial "sidebar-hero.html" (dict "context" $context "image" $sidebarImage "text" $sidebarText) }}
+    <div class="blog-grid">
+      {{- range $pages }}
+        {{ partial "article-card.html" . }}
+      {{- end }}
+    </div>
+  </div>
+{{- else }}
+  <div class="blog-grid">
+    {{- range $pages }}
+      {{ partial "article-card.html" . }}
+    {{- end }}
+  </div>
+{{- end }}

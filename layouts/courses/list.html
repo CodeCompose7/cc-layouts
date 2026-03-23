@@ -1,82 +1,61 @@
 {{ define "main" }}
-  {{ $toc := and (.Params.showTableOfContents | default (.Site.Params.list.showTableOfContents | default false)) (in .TableOfContents "<ul") }}
-  <header>
-    {{ if .Params.showBreadcrumbs | default (.Site.Params.list.showBreadcrumbs | default false) }}
-      {{ partial "breadcrumbs.html" . }}
-    {{ end }}
-    <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">{{ .Title }}</h1>
+<div class="section">
+  <header class="single-header">
+    <h1 class="single-title">{{ .Title }}</h1>
   </header>
-  <section
-    class="{{ if $toc -}}
-      mt-12
-    {{- else -}}
-      mt-0
-    {{- end }} prose flex max-w-full flex-col dark:prose-invert lg:flex-row"
-  >
-    {{ if $toc }}
-      <div class="order-first px-0 lg:order-last lg:max-w-xs lg:ps-8">
-        <div class="toc ps-5 lg:sticky lg:top-10">
-          {{ partial "toc.html" . }}
-        </div>
-      </div>
-    {{ end }}
-    <div class="min-h-0 min-w-0 grow">
+
+  {{- if .Content }}
+    <div class="content-body" style="margin-bottom:32px;">
       {{ .Content | emojify }}
     </div>
-  </section>
-  {{- /* 강의 섹션의 실제 강의들만 재귀적으로 수집 (섹션/카테고리 인덱스 제외) */}}
+  {{- end }}
+
   {{- $allPages := .RegularPagesRecursive }}
-  {{- /* buildDrafts가 false인 경우에만 draft 필터링 */}}
   {{- if not .Site.BuildDrafts }}
     {{- $allPages = where $allPages "Draft" "!=" true }}
   {{- end }}
-  {{- /* 정렬 파라미터 읽기: sortBy (weight/date/title), sortOrder (asc/desc) */}}
+
+  {{- /* Sorting logic: sortBy (weight/date/title), sortOrder (asc/desc) */}}
   {{- $sortBy := .Params.sortBy | default "weight" }}
   {{- $sortOrder := .Params.sortOrder | default "desc" }}
   {{- $sortedPages := slice }}
+
   {{- if eq $sortBy "date" }}
-    {{- /* date 기준 정렬 */}}
     {{- if eq $sortOrder "asc" }}
       {{- $sortedPages = $allPages.ByDate }}
     {{- else }}
       {{- $sortedPages = $allPages.ByDate.Reverse }}
     {{- end }}
   {{- else if eq $sortBy "title" }}
-    {{- /* title 기준 정렬 */}}
     {{- if eq $sortOrder "asc" }}
       {{- $sortedPages = $allPages.ByTitle }}
     {{- else }}
       {{- $sortedPages = $allPages.ByTitle.Reverse }}
     {{- end }}
   {{- else }}
-    {{- /* weight 기준 정렬 (기본값): weight가 있으면 weight 우선, 없으면 date 사용 */}}
+    {{- /* weight sorting with fallback to date */}}
     {{- $pagesWithWeight := where $allPages "Params.weight" "!=" nil }}
     {{- $pagesWithoutWeight := where $allPages "Params.weight" "==" nil }}
-    {{- $sortedWithWeight := slice }}
-    {{- $sortedWithoutWeight := slice }}
     {{- if eq $sortOrder "asc" }}
-      {{- $sortedWithWeight = $pagesWithWeight.ByWeight }}
-      {{- $sortedWithoutWeight = $pagesWithoutWeight.ByDate }}
+      {{- range $pagesWithWeight.ByWeight }}
+        {{- $sortedPages = $sortedPages | append . }}
+      {{- end }}
+      {{- range $pagesWithoutWeight.ByDate }}
+        {{- $sortedPages = $sortedPages | append . }}
+      {{- end }}
     {{- else }}
-      {{- $sortedWithWeight = $pagesWithWeight.ByWeight.Reverse }}
-      {{- $sortedWithoutWeight = $pagesWithoutWeight.ByDate.Reverse }}
-    {{- end }}
-    {{- range $sortedWithWeight }}
-      {{- $sortedPages = $sortedPages | append . }}
-    {{- end }}
-    {{- range $sortedWithoutWeight }}
-      {{- $sortedPages = $sortedPages | append . }}
+      {{- range $pagesWithWeight.ByWeight.Reverse }}
+        {{- $sortedPages = $sortedPages | append . }}
+      {{- end }}
+      {{- range $pagesWithoutWeight.ByDate.Reverse }}
+        {{- $sortedPages = $sortedPages | append . }}
+      {{- end }}
     {{- end }}
   {{- end }}
-  {{- $hasPages := gt (len $sortedPages) 0 }}
-  {{ if $hasPages }}
+
+  {{- if gt (len $sortedPages) 0 }}
     <section>
-      {{- /* 카테고리 필터 추가 */}}
       {{- $currentCategory := "" }}
-      {{- if eq .Kind "term" }}
-        {{- $currentCategory = .Data.Term }}
-      {{- end }}
-      {{- /* 섹션 기반 카테고리 페이지(/.../_categories/<slug>/)인 경우 경로에서 카테고리명 추출 */}}
       {{- if and (eq $currentCategory "") .RelPermalink }}
         {{- if in .RelPermalink "/_categories/" }}
           {{- $pathParts := split (strings.TrimSuffix "/" .RelPermalink) "/" }}
@@ -84,19 +63,17 @@
         {{- end }}
       {{- end }}
       {{ partial "category-filter.html" (dict "context" . "currentCategory" $currentCategory "blogSection" . "section" "courses") }}
-      
-      <div class="flex flex-col">
-        {{ range $sortedPages }}
+
+      <div class="course-list">
+        {{- range $sortedPages }}
           {{ partial "course-card.html" . }}
-        {{ end }}
+        {{- end }}
       </div>
     </section>
-  {{ else }}
-    <section class="prose mt-10 dark:prose-invert">
-      <p class="border-t py-8">
-        <em>{{ i18n "list.no_articles" | emojify }}</em>
-      </p>
-    </section>
-  {{ end }}
+  {{- else }}
+    <p style="color:var(--color-text-secondary); padding:32px 0;">
+      <em>{{ i18n "no_articles" }}</em>
+    </p>
+  {{- end }}
+</div>
 {{ end }}
-

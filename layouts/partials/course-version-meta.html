@@ -1,0 +1,19 @@
+{{- $context := . }}
+{{- $dateFormat := $context.Site.Params.dateFormat | default ($context.Language.Params.dateFormat | default "2 Jan 2006") }}
+{{- $dateStr := $context.Date.Format $dateFormat }}
+{{- $lastStr := $context.Lastmod.Format $dateFormat }}
+<div class="single-meta-item">
+  <i class="ti ti-calendar"></i>
+  {{- if ne $dateStr $lastStr }}
+    <span>{{ i18n "course_updated_at_label" }} {{ $lastStr }}</span>
+  {{- else }}
+    <span>{{ i18n "course_uploaded_at_label" }} {{ $dateStr }}</span>
+  {{- end }}
+</div>
+{{- $version := $context.Params.version | default 1 }}
+{{- if ne $version 1 }}
+  <div class="single-meta-item">
+    <i class="ti ti-git-branch"></i>
+    <span>v{{ $version }}</span>
+  </div>
+{{- end }}

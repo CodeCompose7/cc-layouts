@@ -1,0 +1,19 @@
+{{- $context := .context }}
+{{- $imageFilename := .image | default "" }}
+{{- $text := .text | default "" }}
+
+{{- if or (ne $imageFilename "") (ne $text "") }}
+  <aside class="sidebar-hero">
+    {{- if ne $imageFilename "" }}
+      {{- $imgResource := resources.Get (printf "banner/%s" $imageFilename) }}
+      {{- if $imgResource }}
+        <img src="{{ $imgResource.RelPermalink }}" alt="{{ $text | default "sidebar" }}" loading="lazy" />
+      {{- end }}
+    {{- end }}
+    {{- if ne $text "" }}
+      <div class="sidebar-hero-text">
+        {{ $text | markdownify }}
+      </div>
+    {{- end }}
+  </aside>
+{{- end }}
