@@ -2,13 +2,13 @@
   <div class="footer-inner">
     <div class="footer-col">
       <h4>{{ .Site.Params.footer_courses | default "Courses" }}</h4>
-      <a href="/{{ .Lang }}/courses/">{{ if eq .Lang "ko" }}전체 강의{{ else }}All Courses{{ end }}</a>
-      <a href="/{{ .Lang }}/blog/">{{ if eq .Lang "ko" }}블로그{{ else }}Blog{{ end }}</a>
+      <a href="{{ "courses/" | relLangURL }}">{{ if eq .Lang "ko" }}전체 강의{{ else }}All Courses{{ end }}</a>
+      <a href="{{ "blog/" | relLangURL }}">{{ if eq .Lang "ko" }}블로그{{ else }}Blog{{ end }}</a>
     </div>
     <div class="footer-col">
       <h4>{{ .Site.Params.footer_about | default "About" }}</h4>
-      <a href="/{{ .Lang }}/about/">{{ if eq .Lang "ko" }}소개{{ else }}About Us{{ end }}</a>
-      <a href="/{{ .Lang }}/tags/">{{ if eq .Lang "ko" }}태그{{ else }}Tags{{ end }}</a>
+      <a href="{{ "about/" | relLangURL }}">{{ if eq .Lang "ko" }}소개{{ else }}About Us{{ end }}</a>
+      <a href="{{ "tags/" | relLangURL }}">{{ if eq .Lang "ko" }}태그{{ else }}Tags{{ end }}</a>
     </div>
     <div class="footer-col">
       <h4>{{ .Site.Params.footer_contact | default "Contact" }}</h4>
@@ -26,8 +26,8 @@
     </div>
   </div>
   <div class="footer-logo">
-    <a href="/{{ .Lang }}/">
-      <img src="/img/logo.png" alt="{{ .Site.Title }}">
+    <a href="{{ "" | relLangURL }}">
+      <img src="{{ "img/logo.png" | relURL }}" alt="{{ .Site.Title }}">
       <span>{{ .Site.Params.footer_company }}</span>
     </a>
   </div>

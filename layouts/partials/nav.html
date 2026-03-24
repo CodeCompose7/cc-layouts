@@ -1,8 +1,8 @@
 {{ $currentPage := . }}
 <nav class="site-nav">
   <div class="nav-inner">
-    <a class="nav-logo" href="/{{ .Lang }}/">
-      <img src="/img/logo.png" alt="{{ .Site.Title }} logo">
+    <a class="nav-logo" href="{{ "" | relLangURL }}">
+      <img src="{{ "img/logo.png" | relURL }}" alt="{{ .Site.Title }} logo">
       <span class="nav-site-title">{{ .Site.Title }}</span>
     </a>
 
