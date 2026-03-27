@@ -1,0 +1,25 @@
+{{- $inline := eq (.Get "inline") "true" -}}
+{{- if $inline -}}
+<span class="math-inline">${{- .Inner | safeHTML -}}$</span>
+{{- else -}}
+<div class="math-block">$${{- .Inner | safeHTML -}}$$</div>
+{{- end -}}
+<script>
+  if (!document.querySelector('link[href*="katex"]')) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';
+    document.head.appendChild(link);
+
+    var script = document.createElement('script');
+    script.defer = true;
+    script.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js';
+    document.head.appendChild(script);
+
+    var autoRender = document.createElement('script');
+    autoRender.defer = true;
+    autoRender.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js';
+    autoRender.setAttribute('onload', 'renderMathInElement(document.body, { delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }] })');
+    document.head.appendChild(autoRender);
+  }
+</script>
