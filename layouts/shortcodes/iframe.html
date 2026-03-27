@@ -1,0 +1,37 @@
+{{- $src := .Get "src" -}}
+{{- $height := .Get "height" | default "700px" -}}
+{{- $title := .Get "title" | default "" -}}
+{{- $autoresize := .Get "autoresize" | default "false" -}}
+{{- $id := printf "iframe-%s" (now.UnixNano | string) -}}
+
+<div style="margin: 24px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+  <iframe
+    id="{{ $id }}"
+    src="{{ $src }}"
+    style="width: 100%; height: {{ $height }}; border: none; display: block;"
+    title="{{ $title }}"
+    scrolling="no"
+    loading="lazy"
+  ></iframe>
+</div>
+<div style="text-align: right; margin-top: -12px; margin-bottom: 24px;">
+  <a href="{{ $src }}" target="_blank" rel="noopener" style="font-size: 0.85rem; color: var(--color-primary); text-decoration: none;">
+    ↗ 새 탭에서 열기
+  </a>
+</div>
+
+{{ if eq $autoresize "true" }}
+<script>
+  (function () {
+    var iframe = document.getElementById('{{ $id }}');
+    iframe.addEventListener('load', function () {
+      try {
+        var h = iframe.contentDocument.body.scrollHeight;
+        if (h > 0) iframe.style.height = h + 'px';
+      } catch (e) {
+        // cross-origin: 지정된 height 유지
+      }
+    });
+  })();
+</script>
+{{ end }}
