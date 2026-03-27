@@ -3,6 +3,10 @@
   lineNos = true
   lineNumbersInTable = true
 
+[tableOfContents]
+  startLevel = 2
+  endLevel = 3
+
 [goldmark]
   [goldmark.renderer]
     unsafe = true
