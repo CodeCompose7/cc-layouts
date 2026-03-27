@@ -1,5 +1,9 @@
 {{- $rawSrc := .Get "src" -}}
-{{- $src := cond (hasPrefix $rawSrc "http") $rawSrc ($rawSrc | absURL) -}}
+{{- $src := $rawSrc -}}
+{{- if not (hasPrefix $rawSrc "http") -}}
+  {{- $base := $.Site.BaseURL | strings.TrimRight "/" -}}
+  {{- $src = printf "%s/%s" $base ($rawSrc | strings.TrimLeft "/") -}}
+{{- end -}}
 {{- $height := .Get "height" | default "700px" -}}
 {{- $title := .Get "title" | default "" -}}
 {{- $autoresize := .Get "autoresize" | default "false" -}}
