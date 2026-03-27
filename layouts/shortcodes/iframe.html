@@ -1,4 +1,4 @@
-{{- $src := .Get "src" -}}
+{{- $src := .Get "src" | relURL -}}
 {{- $height := .Get "height" | default "700px" -}}
 {{- $title := .Get "title" | default "" -}}
 {{- $autoresize := .Get "autoresize" | default "false" -}}
