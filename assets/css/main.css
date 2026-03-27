@@ -694,6 +694,13 @@ main {
   text-decoration: none;
 }
 
+.article-card .tag-list,
+.course-card .tag-list {
+  height: 56px;
+  overflow: hidden;
+  align-content: flex-start;
+}
+
 
 /* ==========================================================================
    13. Category Filter

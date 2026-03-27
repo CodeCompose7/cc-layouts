@@ -40,5 +40,38 @@
   {{ partial "nav.html" . }}
   <main>{{ block "main" . }}{{ end }}</main>
   {{ partial "footer.html" . }}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.article-card .tag-list, .course-card .tag-list').forEach(function (list) {
+        var pills = Array.from(list.querySelectorAll('.tag-pill'));
+        if (pills.length === 0) return;
+
+        var firstTop = pills[0].offsetTop;
+        var row2MaxTop = firstTop + pills[0].offsetHeight + 6;
+
+        // 3번째 줄 이상의 pill 찾기
+        var overflowStart = pills.findIndex(function (p) {
+          return p.offsetTop > row2MaxTop + 2;
+        });
+        if (overflowStart === -1) return;
+
+        for (var j = overflowStart; j < pills.length; j++) {
+          pills[j].style.display = 'none';
+        }
+
+        var ellipsis = document.createElement('span');
+        ellipsis.className = 'tag-pill';
+        ellipsis.textContent = '···';
+        ellipsis.style.cursor = 'default';
+        list.appendChild(ellipsis);
+
+        // ···이 3번째 줄로 밀리면 2번째 줄 마지막 pill도 숨김
+        while (ellipsis.offsetTop > row2MaxTop + 2 && overflowStart > 0) {
+          overflowStart--;
+          pills[overflowStart].style.display = 'none';
+        }
+      });
+    });
+  </script>
 </body>
 </html>
