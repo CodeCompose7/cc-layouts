@@ -1126,6 +1126,13 @@ main {
 
 .content-body img {
   border-radius: 12px;
+  margin: 16px auto;
+  display: block;
+}
+
+.content-body .mermaid {
+  display: flex;
+  justify-content: center;
   margin: 16px 0;
 }
 
