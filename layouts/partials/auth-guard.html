@@ -1,0 +1,126 @@
+{{- $auth := .Params.auth | default "free" }}
+{{- $tierLabels := dict "free" "무료 회원" "paid" "유료 회원" "admin" "관리자" }}
+{{- $tierLabel := index $tierLabels $auth | default $auth }}
+{{- $firebaseConfig := .Site.Params.firebaseConfig }}
+
+<div id="auth-guard" class="auth-guard">
+  <div class="auth-guard-card">
+    <div id="auth-loading" style="display:none;">
+      <p>인증 확인 중...</p>
+    </div>
+    <div id="auth-login">
+      <h2>코드컴포즈</h2>
+      <p>이 콘텐츠에 접근하려면 로그인이 필요합니다.</p>
+      <button class="auth-google-btn" onclick="ccSignIn()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" height="20">
+        Google로 로그인
+      </button>
+      <div id="auth-error" style="display:none; color:#d32f2f; margin-top:16px; font-size:13px;"></div>
+    </div>
+    <div id="auth-denied" style="display:none;">
+      <h2>접근 제한</h2>
+      <p>이 콘텐츠는 <strong>{{ $tierLabel }}</strong> 이상만 접근할 수 있습니다.</p>
+      <button class="auth-google-btn" onclick="ccSignOut()" style="margin-top:12px;">
+        로그아웃
+      </button>
+      <a href="/" style="display:block; margin-top:12px; color:#1a73e8; text-decoration:none;">홈으로 돌아가기</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .auth-guard {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 60vh; padding: 32px;
+  }
+  .auth-guard-card {
+    background: var(--color-neutral-100, #f8f9fa);
+    border-radius: 12px; padding: 48px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    text-align: center; max-width: 400px; width: 100%;
+  }
+  .auth-guard-card h2 {
+    font-size: 24px; margin-bottom: 8px;
+    color: var(--color-neutral-900, #333);
+  }
+  .auth-guard-card p {
+    color: var(--color-neutral-600, #666);
+    margin-bottom: 24px; font-size: 14px;
+  }
+  .auth-google-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 12px 24px; border: 1px solid var(--color-neutral-300, #ddd);
+    border-radius: 8px; background: var(--color-neutral-0, white);
+    cursor: pointer; font-size: 15px; transition: box-shadow 0.2s;
+    color: var(--color-neutral-900, #333);
+  }
+  .auth-google-btn:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>
+(function() {
+  var REQUIRED_TIER = "{{ $auth }}";
+  var TIER_LEVELS = { "free": 1, "paid": 2, "admin": 3 };
+
+  firebase.initializeApp({
+    apiKey: "{{ $firebaseConfig.apiKey | default "AIzaSyDhYcOsJ-IgCd1qY1Bwcpx-om43YjjpLPM" }}",
+    authDomain: "{{ $firebaseConfig.authDomain | default "courses-web-6a6f8.firebaseapp.com" }}",
+    projectId: "{{ $firebaseConfig.projectId | default "courses-web-6a6f8" }}"
+  });
+
+  var content = document.getElementById("protected-content");
+  var guard = document.getElementById("auth-guard");
+  var loginDiv = document.getElementById("auth-login");
+  var deniedDiv = document.getElementById("auth-denied");
+  var loadingDiv = document.getElementById("auth-loading");
+  var errorDiv = document.getElementById("auth-error");
+
+  // 로딩 표시
+  loginDiv.style.display = "none";
+  loadingDiv.style.display = "block";
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) {
+      // 미인증 → 로그인 버튼 표시
+      loadingDiv.style.display = "none";
+      loginDiv.style.display = "block";
+      return;
+    }
+
+    // 인증됨 → 토큰에서 티어 확인
+    user.getIdTokenResult().then(function(tokenResult) {
+      var userTier = (tokenResult.claims && tokenResult.claims.tier) || "free";
+      var userLevel = TIER_LEVELS[userTier] || 0;
+      var requiredLevel = TIER_LEVELS[REQUIRED_TIER] || 0;
+
+      if (userLevel >= requiredLevel) {
+        // 접근 허용
+        guard.style.display = "none";
+        content.style.display = "";
+      } else {
+        // 티어 부족
+        loadingDiv.style.display = "none";
+        loginDiv.style.display = "none";
+        deniedDiv.style.display = "block";
+      }
+    });
+  });
+
+  window.ccSignIn = function() {
+    errorDiv.style.display = "none";
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).catch(function(err) {
+      errorDiv.textContent = err.message || "로그인에 실패했습니다.";
+      errorDiv.style.display = "block";
+    });
+  };
+
+  window.ccSignOut = function() {
+    firebase.auth().signOut().then(function() {
+      location.reload();
+    });
+  };
+})();
+</script>
