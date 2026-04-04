@@ -98,7 +98,9 @@
       if (userLevel >= requiredLevel) {
         // 접근 허용
         guard.style.display = "none";
-        content.style.display = "";
+        content.style.visibility = "visible";
+        content.style.height = "";
+        content.style.overflow = "";
       } else {
         // 티어 부족
         loadingDiv.style.display = "none";
