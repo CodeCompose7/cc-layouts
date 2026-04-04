@@ -35,10 +35,20 @@
   <meta name="twitter:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}">
   <meta name="twitter:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
   {{ with .Site.Params.og_image }}<meta name="twitter:image" content="{{ . | absURL }}">{{ end }}
+
+  {{- /* auth 필드가 있으면 검색엔진 제외 */}}
+  {{- with .Params.auth }}
+  <meta name="robots" content="noindex, nofollow">
+  {{- end }}
 </head>
 <body>
   {{ partial "nav.html" . }}
+  {{- if .Params.auth }}
+  <main id="protected-content" style="display:none;">{{ block "main" . }}{{ end }}</main>
+  {{ partial "auth-guard.html" . }}
+  {{- else }}
   <main>{{ block "main" . }}{{ end }}</main>
+  {{- end }}
   {{ partial "footer.html" . }}
   <script>
     document.addEventListener('DOMContentLoaded', function () {
