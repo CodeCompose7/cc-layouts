@@ -43,7 +43,7 @@
 </head>
 <body>
   {{ partial "nav.html" . }}
-  {{- if .Params.auth }}
+  {{- if and .Params.auth (not .Site.Params.disableAuth) }}
   <main id="protected-content" style="visibility:hidden; height:0; overflow:hidden;">{{ block "main" . }}{{ end }}</main>
   {{ partial "auth-guard.html" . }}
   {{- else }}
